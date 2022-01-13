@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 #######################################################################
-# License: GNU General Public License v3.0                            #
-# Homepage: https://github.com/tasooshi/footrecon/                       #
-# Version: 0.1                                                        #
+# License: MIT License                                                #
+# Homepage: https://github.com/tasooshi/footrecon/                    #
+# Version: 0.2                                                        #
 #######################################################################
 
 import setuptools
@@ -14,11 +14,11 @@ with open('README.md') as f:
 
 setuptools.setup(
     name='footrecon',
-    version='0.1',
+    version='0.2',
     author='tasooshi',
     author_email='tasooshi@pm.me',
     description='A mobile all-in-one solution for physical recon',
-    license='GNU General Public License v3.0',
+    license='MIT License',
     keywords=[
         'redteaming',
         'scanner',
@@ -36,7 +36,7 @@ setuptools.setup(
         'imageio-ffmpeg==0.4.5',
         'imageio==2.12.0',
         'numpy==1.21.4',
-        'Pillow==8.4.0',
+        'Pillow==9.0.0',
         'PyBluez==0.23',
         'pyfiglet==0.8.post1',
         'sounddevice==0.4.3',
@@ -52,7 +52,7 @@ setuptools.setup(
     classifiers=[
         'Development Status :: 4 - Beta',
         'Topic :: Utilities',
-        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+        'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',

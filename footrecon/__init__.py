@@ -8,4 +8,4 @@ from footrecon.modules.wireless import *
 
 name = 'Footrecon'
 name_lower = name.lower()
-__version__ = '0.1'
+__version__ = '0.2'

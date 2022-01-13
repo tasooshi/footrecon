@@ -36,7 +36,7 @@ setuptools.setup(
         'imageio-ffmpeg==0.4.5',
         'imageio==2.12.0',
         'numpy==1.21.4',
-        'Pillow==8.4.0',
+        'Pillow==9.0.0',
         'PyBluez==0.23',
         'pyfiglet==0.8.post1',
         'sounddevice==0.4.3',

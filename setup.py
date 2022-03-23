@@ -2,7 +2,7 @@
 #######################################################################
 # License: MIT License                                                #
 # Homepage: https://github.com/tasooshi/footrecon/                    #
-# Version: 0.2                                                        #
+# Version: 0.3                                                        #
 #######################################################################
 
 import setuptools
@@ -14,7 +14,7 @@ with open('README.md') as f:
 
 setuptools.setup(
     name='footrecon',
-    version='0.2',
+    version='0.3',
     author='tasooshi',
     author_email='tasooshi@pm.me',
     description='A mobile all-in-one solution for physical recon',
@@ -36,7 +36,7 @@ setuptools.setup(
         'imageio-ffmpeg==0.4.5',
         'imageio==2.12.0',
         'numpy==1.21.4',
-        'Pillow==9.0.0',
+        'Pillow==9.0.1',
         'PyBluez==0.23',
         'pyfiglet==0.8.post1',
         'sounddevice==0.4.3',

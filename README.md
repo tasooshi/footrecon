@@ -48,6 +48,10 @@ For a headless mode and auto-start use the `--start` argument:
 
 ## Changelog
 
+### 0.4 (2022-03-30)
+
+* Fixed gpsd and Python 3.9 compatibility
+
 ### 0.3 (2022-03-23)
 
 * Updated Pillow

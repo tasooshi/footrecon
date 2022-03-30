@@ -14,10 +14,10 @@ chown $SUDO_USER:$SUDO_USER /usr/local/share/footrecon /usr/local/src/footrecon
 
 sudo -u $SUDO_USER -i <<EOF
     git clone https://github.com/tasooshi/footrecon.git /usr/local/src/footrecon
-    python3 -m venv /usr/local/share/footrecon/venv
+    python3 -m venv --system-site-packages /usr/local/share/footrecon/venv
     source /usr/local/share/footrecon/venv/bin/activate
     pip install --upgrade pip
-    pip install --only-binary numpy numpy==1.21.4
+    pip install --only-binary numpy numpy==1.22.3
     cd /usr/local/src/footrecon
     python setup.py install
 EOF

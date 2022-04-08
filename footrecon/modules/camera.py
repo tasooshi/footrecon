@@ -17,6 +17,7 @@ class Camera(modules.Module):
     output_suffix = '.jpg'
     device_id = '<video0>'
     quality = 80
+    interval = 2
 
     def setup(self):
         try:
@@ -31,6 +32,7 @@ class Camera(modules.Module):
 
     async def task(self):
         output_dir = pathlib.Path(self.session.output_dir, 'camera')
+        logger.debug(f'Writing output to {output_dir}')
         self.session.output_dir_create(output_dir)
         idx = 1
         while self.app.running:
@@ -39,6 +41,7 @@ class Camera(modules.Module):
             filename = self.output_file_name(output_dir, idx)
             with open(filename, 'wb') as fil:
                 fil.write(img)
+            logger.debug(f'Saved image to {filename}')
             idx += 1
-            await asyncio.sleep(1)
+            await asyncio.sleep(self.interval)
         self.device.release()

@@ -48,6 +48,17 @@ For a headless mode and auto-start use the `--start` argument:
 
 ## Changelog
 
+### 0.5 (2022-04-08)
+
+* Added debug mode
+* Fixed re-running
+* Removed logs view
+* Fixed quit exception when in running state
+* Fixed screen refresh on start/stop button click
+* Improved audio device detection
+* More logging
+* Added intervals for all modules
+
 ### 0.4 (2022-03-30)
 
 * Fixed gpsd and Python 3.9 compatibility

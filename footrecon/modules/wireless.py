@@ -39,6 +39,7 @@ class Wireless(modules.Module):
             'scan',
         ]
         filename = self.output_file_name()
+        logger.debug(f'Writing output to {filename}')
         with open(filename, 'w', newline='') as fil:
             writer = csv.writer(fil, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             while self.app.running:
@@ -54,6 +55,7 @@ class Wireless(modules.Module):
                         data.insert(0, now)
                         rows.append(data)
                     writer.writerows(rows)
+                    logger.debug(f'Saved output to {filename}')
                 fil.flush()
                 os.fsync(fil)
                 time.sleep(self.interval)

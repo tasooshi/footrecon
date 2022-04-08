@@ -28,6 +28,7 @@ class Bluetooth(modules.Module):
 
     def _task(self):
         filename = self.output_file_name()
+        logger.debug(f'Writing output to {filename}')
         with open(filename, 'w', newline='') as fil:
             writer = csv.writer(fil, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             while self.app.running:
@@ -37,6 +38,7 @@ class Bluetooth(modules.Module):
                     output = list(dev)
                     output.insert(0, now)
                     writer.writerow(output)
+                    logger.debug(f'Saved output to {filename}')
                 fil.flush()
                 os.fsync(fil)
 

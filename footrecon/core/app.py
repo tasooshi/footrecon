@@ -3,6 +3,7 @@
 import asyncio
 from concurrent import futures
 import datetime
+import logging
 import os
 import shlex
 import subprocess
@@ -43,6 +44,7 @@ class App:
 
     def __init__(self):
         self.running = False
+        self.quit_pending = False
         self.screen = None
         self.tasks = None
         self.session = None
@@ -72,19 +74,17 @@ class App:
         if self.executor:
             self.executor.shutdown(wait=False, cancel_futures=True)
         logger.info('Application stopped')
+        if self.quit_pending:
+            raise StopApplication('Quit')
 
     def start(self):
         logger.info('Application started')
         self.running = True
         self.executor = futures.ThreadPoolExecutor()
         self.session = footrecon.Session()
-        try:
-            asyncio.get_event_loop().run_until_complete(self.main())
-        except KeyboardInterrupt:
-            logger.info('Keyboard interrupt')
-        finally:
-            logger.info('Exiting')
-            self.stop()
+        loop = asyncio.get_event_loop()
+        if not loop.is_running():
+            loop.run_until_complete(self.main())
 
     async def main(self):
         self.tasks = list()
@@ -103,12 +103,11 @@ class App:
 class TabButtons(Layout):
 
     def __init__(self, frame, active_tab):
-        cols = [1, 1, 1, 1, 1]
+        cols = [1, 1, 1, 1]
         super().__init__(cols)
         self._frame = frame
         btns = [
             Button('Controls', self.action_controls, add_box=False),
-            Button('Logs', self.action_logs, add_box=False),
             Button('Settings', self.action_settings, add_box=False),
             Button('Quit', self.action_quit, add_box=False),
         ]
@@ -118,9 +117,6 @@ class TabButtons(Layout):
 
     def action_controls(self):
         raise NextScene('Controls')
-
-    def action_logs(self):
-        raise NextScene('Logs')
 
     def action_settings(self):
         raise NextScene('Settings')
@@ -132,8 +128,8 @@ class TabButtons(Layout):
 
     def action_final_quit(self, selected):
         if selected == 0:
+            app.quit_pending = True
             app.stop()
-            raise StopApplication('Quit')
 
 
 class SaveDataFrame(Frame):
@@ -203,6 +199,7 @@ class ControlsView(SaveDataFrame):
         self.widget_start.disabled = True
         self.widget_stop.disabled = False
         self.widget_stop.focus()
+        self.screen.force_update()
         self.devices_disabled(True)
         self.reset()
         app.start()
@@ -212,44 +209,10 @@ class ControlsView(SaveDataFrame):
         self.widget_stop.disabled = True
         self.widget_start.disabled = False
         self.widget_start.focus()
+        self.screen.force_update()
         self.devices_disabled(False)
         self.reset()
         app.stop()
-
-
-class LogsView(SaveDataFrame):
-
-    def __init__(self, screen):
-        super().__init__(screen, screen.height, screen.width, can_scroll=False, title=footrecon.name + ' [Logs]')
-        self._last_frame = 0
-        layout_utility = Layout([1])
-        layout_main = Layout([1], fill_frame=True)
-        layout_divider_bottom = Layout([1])
-        self.add_layout(layout_utility)
-        self.add_layout(layout_main)
-        self.add_layout(layout_divider_bottom)
-        self.logs_textbox = TextBox(Widget.FILL_FRAME, None, 'logs', as_string=True, line_wrap=True, readonly=True)
-        layout_main.add_widget(self.logs_textbox)
-        layout_divider_bottom.add_widget(Divider())
-        layout_tabs = TabButtons(self, 1)
-        self.add_layout(layout_tabs)
-        self.fix()
-
-    def _update(self, frame_no):
-        if frame_no - self._last_frame >= self.frame_update_count or self._last_frame == 0:
-            self._last_frame = frame_no
-            with open(footrecon.name_lower + '.log', 'r') as fil:
-                self.logs_textbox.value = fil.read()
-        super()._update(frame_no)
-
-    @property
-    def frame_update_count(self):
-        return 80
-
-    def action_refresh(self):
-        with open(footrecon.name_lower + '.log', 'r') as fil:
-            self.data['logs'] = fil.read()
-        self.reset()
 
 
 class SettingsView(SaveDataFrame):
@@ -318,7 +281,6 @@ class SettingsView(SaveDataFrame):
 def play(screen, scene):
     scenes = [
         Scene([ControlsView(screen)], -1, name='Controls'),
-        Scene([LogsView(screen)], -1, name='Logs'),
         Scene([SettingsView(screen)], -1, name='Settings'),
     ]
     app.screen = screen
@@ -330,7 +292,9 @@ app = App()
 
 
 def entry_point():
-    if '--start' in sys.argv:  # FIXME: Replace with argparse etc
+    if '--debug' in sys.argv:  # FIXME: Replace with argparse etc
+        logger.setLevel(logging.DEBUG)
+    if '--start' in sys.argv:
         app.start()
     else:
         last_scene = None

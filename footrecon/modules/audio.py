@@ -22,9 +22,8 @@ class Audio(modules.Module):
         self.queue = asyncio.Queue()
 
     def setup(self):
-        try:
-            self.device = sounddevice.default.device[0]
-        except Exception as exc:
+        self.device = sounddevice.default.device[0]
+        if self.device < 0:
             logger.debug('Device not found for {}'.format(self.__class__.__name__))
         else:
             self.device_name = '#' + str(self.device)
@@ -36,6 +35,7 @@ class Audio(modules.Module):
             loop.call_soon_threadsafe(self.queue.put_nowait, (indata.copy(), status))
 
         filename = self.output_file_name()
+        logger.debug(f'Writing output to {filename}')
         with soundfile.SoundFile(filename, mode='x', samplerate=self.samplerate, channels=self.channels) as file:
             with sounddevice.InputStream(samplerate=self.samplerate, device=self.device, channels=self.channels, callback=callback):
                 while self.app.running:

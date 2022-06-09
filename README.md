@@ -48,6 +48,10 @@ For a headless mode and auto-start use the `--start` argument:
 
 ## Changelog
 
+### 0.6 (2022-04-08)
+
+* Updated Pillow
+
 ### 0.5 (2022-04-08)
 
 * Added debug mode

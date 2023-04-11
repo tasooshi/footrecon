@@ -2,19 +2,26 @@
 #######################################################################
 # License: MIT License                                                #
 # Homepage: https://github.com/tasooshi/footrecon/                    #
-# Version: 0.6                                                        #
 #######################################################################
 
+import pathlib
 import setuptools
 
 
-with open('README.md') as f:
-    long_description = f.read()
+def from_file(*names, encoding='utf8'):
+    return pathlib.Path(
+        pathlib.Path(__file__).parent, *names
+    ).read_text(encoding=encoding)
+
+
+version = {}
+contents = pathlib.Path('src/footrecon/version.py').read_text()
+exec(contents, version)
 
 
 setuptools.setup(
     name='footrecon',
-    version='0.6',
+    version=version['__version__'],
     author='tasooshi',
     author_email='tasooshi@pm.me',
     description='A mobile all-in-one solution for physical recon',
@@ -22,24 +29,27 @@ setuptools.setup(
     keywords=[
         'redteaming',
         'scanner',
+        'wardriving',
         'discovery',
     ],
-    long_description=long_description,
+    long_description=from_file('README.md'),
     long_description_content_type='text/markdown',
     url='https://github.com/tasooshi/footrecon/',
-    packages=setuptools.find_packages(),
+    packages=setuptools.find_packages('src'),
+    package_dir={'': 'src'},
+    include_package_data=True,
     install_requires=(
-        'asciimatics==1.13.0',
-        'cffi==1.15.0',
-        'imageio-ffmpeg==0.4.5',
-        'imageio==2.16.1',
-        'numpy==1.22.3',
-        'Pillow==9.1.1',
+        'asciimatics==1.14.0',
+        'cffi==1.15.1',
+        'imageio-ffmpeg==0.4.8',
+        'imageio==2.27.0',
+        'numpy==1.24.2',
+        'Pillow==9.5.0',
         'PyBluez==0.23',
         'pyfiglet==0.8.post1',
-        'sounddevice==0.4.4',
-        'SoundFile==0.10.3.post1',
-        'wcwidth==0.2.5',
+        'sounddevice==0.4.6',
+        'SoundFile==0.12.1',
+        'wcwidth==0.2.6',
     ),
     zip_safe=False,
     entry_points={
@@ -51,8 +61,8 @@ setuptools.setup(
         'Development Status :: 4 - Beta',
         'Topic :: Utilities',
         'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
     ]
 )

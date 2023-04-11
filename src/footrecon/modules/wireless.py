@@ -1,8 +1,5 @@
-import asyncio
 import csv
-import datetime
 import os
-import pathlib
 import shlex
 import subprocess
 import time
@@ -27,22 +24,20 @@ class Wireless(modules.Module):
         wlans = [dev.decode('utf8') for dev in output.stdout.split() if dev.startswith(b'wl')]
         try:
             self.device = wlans[0]
-        except Exception as exc:
+        except IndexError:
             logger.debug('Device not found for {}'.format(self.__class__.__name__))
         else:
             self.device_name = self.device
 
-    def _task(self):
+    def task(self, output_file_name, stop_event):
         cmd_args = [
             self.bin_path,
             self.device,
             'scan',
         ]
-        filename = self.output_file_name()
-        logger.debug(f'Writing output to {filename}')
-        with open(filename, 'w', newline='') as fil:
+        with open(output_file_name, 'w', newline='') as fil:
             writer = csv.writer(fil, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            while self.app.running:
+            while True:
                 proc = subprocess.run(cmd_args, capture_output=True, universal_newlines=True)
                 lines = proc.stdout.split('\n')
                 lines = [line.strip() for line in lines]
@@ -55,10 +50,9 @@ class Wireless(modules.Module):
                         data.insert(0, now)
                         rows.append(data)
                     writer.writerows(rows)
-                    logger.debug(f'Saved output to {filename}')
+                    logger.debug(f'Saved output to {output_file_name}')
                 fil.flush()
                 os.fsync(fil)
                 time.sleep(self.interval)
-
-    async def task(self):
-        await asyncio.get_running_loop().run_in_executor(self.executor, self._task)
+                if stop_event.is_set():
+                    return

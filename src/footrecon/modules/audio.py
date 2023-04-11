@@ -1,5 +1,4 @@
-import asyncio
-
+import queue
 import sounddevice
 import soundfile
 
@@ -19,7 +18,7 @@ class Audio(modules.Module):
 
     def __init__(self, *args):
         super().__init__(*args)
-        self.queue = asyncio.Queue()
+        self.queue = queue.Queue()
 
     def setup(self):
         self.device = sounddevice.default.device[0]
@@ -28,16 +27,19 @@ class Audio(modules.Module):
         else:
             self.device_name = '#' + str(self.device)
 
-    async def task(self):
-        loop = asyncio.get_event_loop()
+    def task(self, output_file_name, stop_event):
 
         def callback(indata, frames, time, status):
-            loop.call_soon_threadsafe(self.queue.put_nowait, (indata.copy(), status))
+            self.queue.put(indata.copy(), status)
 
-        filename = self.output_file_name()
-        logger.debug(f'Writing output to {filename}')
-        with soundfile.SoundFile(filename, mode='x', samplerate=self.samplerate, channels=self.channels) as file:
+        with soundfile.SoundFile(output_file_name, mode='x', samplerate=self.samplerate, channels=self.channels) as file:
             with sounddevice.InputStream(samplerate=self.samplerate, device=self.device, channels=self.channels, callback=callback):
-                while self.app.running:
-                    indata, status = await self.queue.get()
-                    file.write(indata)
+                while True:
+                    try:
+                        indata, status = self.queue.get_nowait()
+                    except queue.Empty:
+                        break
+                    else:
+                        file.write(indata)
+                    if stop_event.is_set():
+                        return

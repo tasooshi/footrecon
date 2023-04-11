@@ -17,7 +17,7 @@ sudo -u $SUDO_USER -i <<EOF
     python3 -m venv --system-site-packages /usr/local/share/footrecon/venv
     source /usr/local/share/footrecon/venv/bin/activate
     pip install --upgrade pip
-    pip install --only-binary numpy numpy==1.22.3
+    pip install --only-binary numpy numpy==1.24.2
     cd /usr/local/src/footrecon
     python setup.py install
 EOF

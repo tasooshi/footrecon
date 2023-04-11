@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 
-import asyncio
-from concurrent import futures
+import argparse
+import concurrent.futures
 import datetime
 import logging
-import os
+import pathlib
 import shlex
 import subprocess
 import sys
+import threading
 
 from asciimatics.widgets import (
     Button,
@@ -18,8 +19,6 @@ from asciimatics.widgets import (
     PopUpDialog,
     DatePicker,
     TimePicker,
-    TextBox,
-    Widget,
 )
 from asciimatics.scene import Scene
 from asciimatics.screen import Screen
@@ -33,7 +32,7 @@ import footrecon
 from footrecon.core.logs import logger
 from footrecon.modules import (
     audio,
-    bluetooth,
+    blue,
     satnav,
     camera,
     wireless,
@@ -43,61 +42,52 @@ from footrecon.modules import (
 class App:
 
     def __init__(self):
-        self.running = False
-        self.quit_pending = False
         self.screen = None
-        self.tasks = None
-        self.session = None
+        self.workers = None
         self.executor = None
+        self.stop_event = threading.Event()
         self.tasks = list()
         self.data = dict()
         self.modules = dict()
-        self.modules['audio'] = audio.Audio(self, self.executor)
-        self.modules['bluetooth'] = bluetooth.Bluetooth(self, self.executor)
-        self.modules['satnav'] = satnav.Satnav(self, self.executor)
-        self.modules['camera'] = camera.Camera(self, self.executor)
-        self.modules['wireless'] = wireless.Wireless(self, self.executor)
+        self.modules['audio'] = audio.Audio()
+        self.modules['bluetooth'] = blue.Bluetooth()
+        self.modules['satnav'] = satnav.Satnav()
+        self.modules['camera'] = camera.Camera()
+        self.modules['wireless'] = wireless.Wireless()
         for mod in self.modules.keys():
             self.data[mod] = self.modules[mod].device_name
-
-    def screen_update(self):
-        self.screen.draw_next_frame()
-        asyncio.get_event_loop().call_later(0.1, self.screen_update)
 
     def data_update(self, data):
         self.data.update(data)
 
-    def stop(self):
-        self.running = False
-        for task in self.tasks:
-            task.cancel()
-        if self.executor:
-            self.executor.shutdown(wait=False, cancel_futures=True)
-        logger.info('Application stopped')
-        if self.quit_pending:
+    def stop(self, final=False):
+        self.stop_event.set()
+        if final:
+            for name, module in self.modules.items():
+                if self.data[name]:
+                    logger.info(f'Running cleanup for {name}')
+                    module.cleanup()
             raise StopApplication('Quit')
+        self.executor.shutdown(wait=False, cancel_futures=True)
+
+    def output_dir_name(self):
+        name_date = datetime.datetime.now().strftime('%Y%m%d_%H%M')
+        name = footrecon.name_lower + '-' + name_date
+        suffix = 0
+        while pathlib.Path(name).exists():
+            suffix += 1
+            name = footrecon.name_lower + '-' + name_date + '-' + str(suffix)
+        return name
 
     def start(self):
         logger.info('Application started')
-        self.running = True
-        self.executor = futures.ThreadPoolExecutor()
-        self.session = footrecon.Session()
-        loop = asyncio.get_event_loop()
-        if not loop.is_running():
-            loop.run_until_complete(self.main())
-
-    async def main(self):
         self.tasks = list()
+        self.stop_event.clear()
+        output_dir_name = self.output_dir_name()
+        self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=self.workers)
         for name, module in self.modules.items():
             if self.data[name]:
-                self.tasks.append(asyncio.create_task(module.execute(self.session)))
-        try:
-            for task in self.tasks:
-                await task
-        except asyncio.CancelledError:
-            return
-        except Exception as exc:
-            logger.error(f'Error: {exc}')
+                self.tasks.append(self.executor.submit(module.execute, output_dir_name, self.stop_event))
 
 
 class TabButtons(Layout):
@@ -128,8 +118,7 @@ class TabButtons(Layout):
 
     def action_final_quit(self, selected):
         if selected == 0:
-            app.quit_pending = True
-            app.stop()
+            app.stop(final=True)
 
 
 class SaveDataFrame(Frame):
@@ -278,23 +267,31 @@ class SettingsView(SaveDataFrame):
         raise NextScene('Settings')
 
 
+app = App()
+
+
 def play(screen, scene):
     scenes = [
         Scene([ControlsView(screen)], -1, name='Controls'),
         Scene([SettingsView(screen)], -1, name='Settings'),
     ]
     app.screen = screen
-    asyncio.get_event_loop().call_soon(app.screen_update)
     screen.play(scenes, stop_on_resize=True, start_scene=scene, allow_int=True)
 
 
-app = App()
-
-
 def entry_point():
-    if '--debug' in sys.argv:  # FIXME: Replace with argparse etc
-        logger.setLevel(logging.DEBUG)
-    if '--start' in sys.argv:
+    parser = argparse.ArgumentParser(
+        description='A mobile all-in-one solution for physical recon.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+    parser.add_argument('--headless', action='store_true', help='Run in headless mode')
+    parser.add_argument('--debug', action='store_const', dest='loglevel', const=logging.DEBUG, default=logging.INFO, help='Enable debugging mode (verbose output)')
+    parser.add_argument('--workers', default=4, type=int, help='Number of concurrent workers')
+    args = parser.parse_args()
+    logger.setLevel(args.loglevel)
+    app.workers = args.workers
+    app.headless = args.headless
+    if app.headless:
         app.start()
     else:
         last_scene = None

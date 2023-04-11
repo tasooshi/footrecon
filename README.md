@@ -45,37 +45,3 @@ For a headless mode and auto-start use the `--start` argument:
 ### Notes
 
 * The installation script uses the `sudo` environment variable `$SUDO_USER` as the target user for which the necessary changes should be made. You may want to adjust that to your setup.
-
-## Changelog
-
-### 0.6 (2022-04-08)
-
-* Updated Pillow
-
-### 0.5 (2022-04-08)
-
-* Added debug mode
-* Fixed re-running
-* Removed logs view
-* Fixed quit exception when in running state
-* Fixed screen refresh on start/stop button click
-* Improved audio device detection
-* More logging
-* Added intervals for all modules
-
-### 0.4 (2022-03-30)
-
-* Fixed gpsd and Python 3.9 compatibility
-
-### 0.3 (2022-03-23)
-
-* Updated Pillow
-
-### 0.2 (2022-01-13)
-
-* Updated Pillow
-* Changed license
-
-### 0.1 (2021-11-24)
-
-* Initial release

@@ -1,6 +1,4 @@
-import asyncio
-import pathlib
-import subprocess
+import time
 
 import imageio
 
@@ -22,26 +20,25 @@ class Camera(modules.Module):
     def setup(self):
         try:
             self.device = imageio.get_reader(self.device_id)
-        except Exception as exc:
+        except IndexError:
             logger.debug('Device not found for {}'.format(self.__class__.__name__))
         else:
             self.device_name = self.device_id
 
-    def output_file_name(self, output_dir, idx=''):
-        return str(pathlib.Path(output_dir, self.output_prefix + str(idx) + self.output_suffix))
-
-    async def task(self):
-        output_dir = pathlib.Path(self.session.output_dir, 'camera')
-        logger.debug(f'Writing output to {output_dir}')
-        self.session.output_dir_create(output_dir)
+    def task(self, output_file_name, stop_event):
         idx = 1
-        while self.app.running:
+        file_base = list(output_file_name.partition(self.output_suffix))
+        while True:
             frame = self.device.get_next_data()
             img = imageio.imwrite('<bytes>', frame, plugin='pillow', format='JPEG')
-            filename = self.output_file_name(output_dir, idx)
-            with open(filename, 'wb') as fil:
+            indexed_file_name = file_base[0] + str(idx) + file_base[1]
+            with open(indexed_file_name, 'wb') as fil:
                 fil.write(img)
-            logger.debug(f'Saved image to {filename}')
+            logger.debug(f'Saved image to {indexed_file_name}')
             idx += 1
-            await asyncio.sleep(self.interval)
-        self.device.release()
+            time.sleep(self.interval)
+            if stop_event.is_set():
+                return
+
+    def cleanup(self):
+        self.device.close()

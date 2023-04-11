@@ -16,7 +16,6 @@ sudo -u $SUDO_USER -i <<EOF
     git clone https://github.com/tasooshi/footrecon.git /usr/local/src/footrecon
     python3 -m venv --system-site-packages /usr/local/share/footrecon/venv
     source /usr/local/share/footrecon/venv/bin/activate
-    pip install --upgrade --no-cache-dir setuptools==57.5.0
     cd /usr/local/src/footrecon
     python setup.py install
 EOF

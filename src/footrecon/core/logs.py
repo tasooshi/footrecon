@@ -1,5 +1,4 @@
 import logging
-import pathlib
 
 
 formatter = logging.Formatter('%(levelname)s [%(asctime)s] %(message)s')

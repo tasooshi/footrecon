@@ -22,13 +22,21 @@ class Audio(modules.Module):
 
     def setup(self):
         self.device = sounddevice.default.device[0]
-        result = sounddevice.query_devices(self.device)
-        if 'default_samplerate' in result:
-            self.samplerate = int(result['default_samplerate'])
-        if self.device < 0:
-            logger.debug('Device not found for {}'.format(self.__class__.__name__))
+        found = True
+        try:
+            result = sounddevice.query_devices(self.device)
+        except sounddevice.PortAudioError:
+            found = False
         else:
+            if self.device < 0:
+                found = False
+            else:
+                if 'default_samplerate' in result:
+                    self.samplerate = int(result['default_samplerate'])
+        if found:
             self.device_name = '#' + str(self.device)
+        else:
+            logger.debug('Device not found for {}'.format(self.__class__.__name__))
 
     def task(self, output_file_name, stop_event):
 

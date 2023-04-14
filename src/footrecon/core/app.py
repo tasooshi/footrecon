@@ -45,6 +45,7 @@ class App:
         self.screen = None
         self.workers = None
         self.executor = None
+        self.headless = False
         self.stop_event = threading.Event()
         self.tasks = list()
         self.data = dict()
@@ -85,6 +86,8 @@ class App:
         self.tasks = list()
         self.stop_event.clear()
         output_dir_name = self.output_dir_name()
+        if self.headless:
+            print(f'Saving output to {output_dir_name}')
         self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=self.workers)
         for name, module in self.modules.items():
             if self.data[name]:
@@ -291,8 +294,9 @@ def entry_point():
     args = parser.parse_args()
     logger.setLevel(args.loglevel)
     app.workers = args.workers
-    app.headless = args.headless
-    if app.headless:
+    if args.headless:
+        app.headless = True
+        print('Running in headless mode')
         app.start()
     else:
         last_scene = None

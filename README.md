@@ -26,8 +26,6 @@ As a regular `dietpi` user:
 
 You may want to start Footrecon automatically on-boot. In this case it is best to use the `dietpi-autostart` utility. Add the following to your (custom, foreground, autologin) script:
 
-In `/var/lib/dietpi/dietpi-autostart/custom.sh`:
-
     #!/bin/bash
     /usr/local/share/footrecon/venv/bin/footrecon
     exit 0
@@ -37,6 +35,10 @@ For a headless mode and auto-start use the `--headless` argument:
     #!/bin/bash
     /usr/local/share/footrecon/venv/bin/footrecon --headless
     exit 0
+
+Finally, fix the permissions:
+
+    dietpi@DietPi:~: sudo chmod a+x /var/lib/dietpi/dietpi-autostart/custom.sh
 
 ### Notes
 

@@ -25,6 +25,8 @@ class Satnav(modules.Module):
         with open(output_file_name, 'w', newline='') as fil:
             writer = csv.writer(fil, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             while True:
+                if stop_event.is_set():
+                    break
                 report = self.device.next()
                 if report['class'] == 'TPV':
                     writer.writerow([
@@ -41,5 +43,3 @@ class Satnav(modules.Module):
                 fil.flush()
                 os.fsync(fil)
                 time.sleep(self.interval)
-                if stop_event.is_set():
-                    break

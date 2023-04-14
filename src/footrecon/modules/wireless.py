@@ -38,6 +38,8 @@ class Wireless(modules.Module):
         with open(output_file_name, 'w', newline='') as fil:
             writer = csv.writer(fil, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             while True:
+                if stop_event.is_set():
+                    break
                 proc = subprocess.run(cmd_args, capture_output=True, universal_newlines=True)
                 lines = proc.stdout.split('\n')
                 lines = [line.strip() for line in lines]
@@ -54,5 +56,3 @@ class Wireless(modules.Module):
                 fil.flush()
                 os.fsync(fil)
                 time.sleep(self.interval)
-                if stop_event.is_set():
-                    break

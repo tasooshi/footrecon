@@ -28,6 +28,8 @@ class Bluetooth(modules.Module):
         with open(output_file_name, 'w', newline='') as fil:
             writer = csv.writer(fil, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             while True:
+                if stop_event.is_set():
+                    break
                 devices = bluetooth.discover_devices(duration=self.interval, lookup_names=True, flush_cache=True, lookup_class=False)
                 now = self.isodatetime()
                 for dev in devices:
@@ -37,5 +39,3 @@ class Bluetooth(modules.Module):
                     logger.debug(f'Saved output to {output_file_name}')
                 fil.flush()
                 os.fsync(fil)
-                if stop_event.is_set():
-                    break

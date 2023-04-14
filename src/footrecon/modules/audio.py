@@ -43,8 +43,8 @@ class Audio(modules.Module):
         with soundfile.SoundFile(output_file_name, mode='x', samplerate=self.samplerate, subtype='PCM_16', channels=self.channels) as fil:
             with sounddevice.RawInputStream(samplerate=self.samplerate, blocksize=self.blocksize, dtype='int16', device=self.device, channels=self.channels) as in_stream:
                 while True:
+                    if stop_event.is_set():
+                        break
                     sounddevice.sleep(int(1000 * self.blocksize / self.samplerate))
                     in_data, _ = in_stream.read(self.blocksize)
                     fil.buffer_write(in_data, dtype=in_stream.dtype)
-                    if stop_event.is_set():
-                        break

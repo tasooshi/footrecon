@@ -68,7 +68,6 @@ class App:
             for name, module in self.modules.items():
                 if self.data[name]:
                     logger.info(f'Running cleanup for {name}')
-                    module.cleanup()
             raise StopApplication('Quit')
         self.executor.shutdown(wait=False, cancel_futures=True)
 

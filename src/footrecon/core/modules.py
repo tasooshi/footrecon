@@ -33,8 +33,5 @@ class Module:
     def task(self, output_file_name):
         raise NotImplementedError
 
-    def cleanup(self):
-        pass
-
     def isodatetime(self):
         return datetime.datetime.utcnow().isoformat() + 'Z'

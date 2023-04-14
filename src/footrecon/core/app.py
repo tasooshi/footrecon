@@ -62,6 +62,8 @@ class App:
 
     def stop(self, final=False):
         self.stop_event.set()
+        for task in self.tasks:
+            task.result()
         if final:
             for name, module in self.modules.items():
                 if self.data[name]:

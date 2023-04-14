@@ -16,8 +16,8 @@ sudo -u $SUDO_USER -i <<EOF
     git clone https://github.com/tasooshi/footrecon.git /usr/local/src/footrecon
     python3 -m venv --system-site-packages /usr/local/share/footrecon/venv
     source /usr/local/share/footrecon/venv/bin/activate
-    cd /usr/local/src/footrecon
-    python setup.py install
+    pip install --upgrade pip
+    pip install -e /usr/local/src/footrecon
 EOF
 
 echo "$SUDO_USER   ALL=NOPASSWD:/usr/bin/timedatectl,/usr/bin/date,/usr/sbin/hwclock" > /etc/sudoers.d/footrecon

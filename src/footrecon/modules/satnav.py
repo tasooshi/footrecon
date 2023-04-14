@@ -42,4 +42,4 @@ class Satnav(modules.Module):
                 os.fsync(fil)
                 time.sleep(self.interval)
                 if stop_event.is_set():
-                    return
+                    break

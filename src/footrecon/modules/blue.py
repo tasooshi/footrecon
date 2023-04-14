@@ -1,7 +1,5 @@
 import csv
-import datetime
 import os
-import select
 
 import bluetooth
 
@@ -10,32 +8,6 @@ from footrecon.core import modules
 
 
 __all__ = ['Bluetooth']
-
-
-class CustomDiscoverer(bluetooth.DeviceDiscoverer):
-
-    def __init__(self, output_file_name, /, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.output_file_name = output_file_name
-        self.fil = open(output_file_name, 'w', newline='')
-        self.writer = csv.writer(self.fil, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-
-    def pre_inquiry(self):
-        self.done = False
-
-    def isodatetime(self):
-        return datetime.datetime.utcnow().isoformat() + 'Z'
-
-    def device_discovered(self, address, device_class, rssi, name):
-        output = list(address, device_class, rssi, name)
-        output.insert(0, self.isodatetime())
-        self.writer.writerow(output)
-        logger.debug(f'Saved output to {self.output_file_name}')
-        self.fil.flush()
-        os.fsync(self.fil)
-
-    def inquiry_complete(self):
-        self.done = True
 
 
 class Bluetooth(modules.Module):
@@ -53,14 +25,17 @@ class Bluetooth(modules.Module):
             self.device_name = '#' + str(self.device)
 
     def task(self, output_file_name, stop_event):
-        discoverer = CustomDiscoverer(output_file_name)
-        discoverer.find_devices(lookup_names=True)
-        readfiles = [discoverer, ]
-        while True:
-            rfds = select.select(readfiles, [], [])[0]
-            if discoverer in rfds:
-                discoverer.process_event()
-            if discoverer.done:
-                break
-            if stop_event.is_set():
-                return
+        with open(output_file_name, 'w', newline='') as fil:
+            writer = csv.writer(fil, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            while True:
+                devices = bluetooth.discover_devices(duration=self.interval, lookup_names=True, flush_cache=True, lookup_class=False)
+                now = self.isodatetime()
+                for dev in devices:
+                    output = list(dev)
+                    output.insert(0, now)
+                    writer.writerow(output)
+                    logger.debug(f'Saved output to {output_file_name}')
+                fil.flush()
+                os.fsync(fil)
+                if stop_event.is_set():
+                    break

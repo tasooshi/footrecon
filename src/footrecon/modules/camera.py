@@ -38,7 +38,7 @@ class Camera(modules.Module):
             idx += 1
             time.sleep(self.interval)
             if stop_event.is_set():
-                return
+                break
 
     def cleanup(self):
         self.device.close()

@@ -30,7 +30,6 @@ class Camera(modules.Module):
         file_base = list(output_file_name.partition(self.output_suffix))
         while True:
             if stop_event.is_set():
-                self.device.close()
                 break
             frame = self.device.get_next_data()
             img = imageio.imwrite('<bytes>', frame, plugin='pillow', format='JPEG')
@@ -40,3 +39,4 @@ class Camera(modules.Module):
             logger.debug(f'Saved image to {indexed_file_name}')
             idx += 1
             time.sleep(self.interval)
+        self.device.close()

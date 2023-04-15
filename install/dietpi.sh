@@ -18,7 +18,7 @@ mkdir -p /usr/local/share/footrecon /usr/local/src/footrecon
 chown $SUDO_USER:$SUDO_USER /usr/local/share/footrecon /usr/local/src/footrecon
 
 chmod a+s /usr/sbin/iwlist
-chmod a+s /usr/sbin/btmgmt
+chmod a+s /usr/bin/btmgmt
 sudo -u $SUDO_USER -i <<EOF
     git clone https://github.com/tasooshi/footrecon.git /usr/local/src/footrecon
     python3 -m venv --system-site-packages /usr/local/share/footrecon/venv

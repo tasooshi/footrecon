@@ -2,27 +2,17 @@
 
 ## About
 
-A mobile all-in-one solution for the initial on-premises information gathering using wifi, bluetooth, camera, audio and GPS. Designed to work with Kali Linux and DietPi.
+A mobile all-in-one solution for the initial on-premises information gathering using wifi, bluetooth, camera, audio and GPS. Designed to work with DietPi nad Raspberry Pi out of the box.
 
 ![Footrecon - main view](docs/footrecon-screenshot.png)
 
 ## Installation
 
-Using the provided installation scripts:
-
-### Kali Linux
-
-As a regular `user`:
-
-    user@localhost:~$ sudo /bin/bash -c "$(curl https://raw.githubusercontent.com/tasooshi/footrecon/main/install/kali.sh)"
-
-### DietPi
-
 As a regular `dietpi` user:
 
     dietpi@DietPi:~$ sudo /bin/bash -c "$(curl https://raw.githubusercontent.com/tasooshi/footrecon/main/install/dietpi.sh)"
 
-#### Autoboot
+### Autoboot
 
 You may want to start Footrecon automatically on-boot. In this case it is best to use the `dietpi-autostart` utility. Add the following to your (custom, foreground, autologin) script:
 
@@ -42,5 +32,5 @@ Finally, fix the permissions:
 
 ### Notes
 
-* It takes the first available device from every group.
+* It takes the first available device from every device group.
 * The installation script uses the `sudo` environment variable `$SUDO_USER` as the target user for which the necessary changes should be made. You may want to adjust that to your setup.

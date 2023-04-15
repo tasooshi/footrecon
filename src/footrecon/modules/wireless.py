@@ -13,11 +13,9 @@ __all__ = ['Wireless']
 
 class Wireless(modules.Module):
 
-    bin_path = '/usr/sbin/iwlist'
     output_prefix = 'wireless'
     output_suffix = '.csv'
     interval = 2
-    separator = 'Cell '
 
     def setup(self):
         output = subprocess.run(shlex.split('ls /sys/class/net/'), capture_output=True)
@@ -30,11 +28,11 @@ class Wireless(modules.Module):
             self.device_name = self.device
 
     def task(self, output_file_name, stop_event):
-        cmd_args = [
-            self.bin_path,
+        cmd_args = (
+            '/usr/sbin/iwlist',
             self.device,
             'scan',
-        ]
+        )
         with open(output_file_name, 'w', newline='') as fil:
             writer = csv.writer(fil, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             while True:
@@ -43,7 +41,7 @@ class Wireless(modules.Module):
                 proc = subprocess.run(cmd_args, capture_output=True, universal_newlines=True)
                 lines = proc.stdout.split('\n')
                 lines = [line.strip() for line in lines]
-                indexes = [i for i, s in enumerate(lines) if self.separator in s]
+                indexes = [i for i, s in enumerate(lines) if 'Cell ' in s]
                 if indexes:
                     rows = list()
                     now = self.isodatetime()

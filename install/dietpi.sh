@@ -7,7 +7,7 @@ fi
 
 export DEBIAN_FRONTEND=noninteractive
 
-apt-get install -y -o APT::Immediate-Configure=false git build-essential python3-pip python3-dev python3-venv libbluetooth-dev libportaudio2 bluetooth gpsd gpsd-clients libjpeg-dev libffi-dev ffmpeg libatlas3-base python3-pycparser
+apt-get install -y -o APT::Immediate-Configure=false git build-essential python3-pip python3-dev python3-venv libportaudio2 bluetooth gpsd gpsd-clients libjpeg-dev libffi-dev ffmpeg libatlas3-base python3-pycparser
 
 /boot/dietpi/func/dietpi-set_hardware wifimodules onboard_enable
 /boot/dietpi/func/dietpi-set_hardware wifimodules enable
@@ -18,6 +18,7 @@ mkdir -p /usr/local/share/footrecon /usr/local/src/footrecon
 chown $SUDO_USER:$SUDO_USER /usr/local/share/footrecon /usr/local/src/footrecon
 
 chmod a+s /usr/sbin/iwlist
+chmod a+s /usr/sbin/btmgmt
 sudo -u $SUDO_USER -i <<EOF
     git clone https://github.com/tasooshi/footrecon.git /usr/local/src/footrecon
     python3 -m venv --system-site-packages /usr/local/share/footrecon/venv

@@ -45,7 +45,6 @@ setuptools.setup(
         'imageio==2.27.0',
         'numpy==1.24.2',
         'Pillow==9.5.0',
-        'PyBluez@git+https://github.com/pybluez/pybluez.git#egg=pybluez',
         'pyfiglet==0.8.post1',
         'sounddevice==0.4.6',
         'SoundFile==0.12.1',

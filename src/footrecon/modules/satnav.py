@@ -29,7 +29,10 @@ class Satnav(modules.Module):
             waiting = self.device.waiting(timeout=self.timeout)
             if stop_event.is_set() or not waiting:
                 break
-            report = self.device.next()
+            try:
+                report = self.device.next()
+            except TypeError:
+                break
             if report['class'] == 'TPV':
                 writer.writerow([
                     getattr(report, 'time', ''),

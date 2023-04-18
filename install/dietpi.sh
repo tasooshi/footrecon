@@ -26,6 +26,8 @@ pip install -e /usr/local/src/footrecon/
 
 # Enable GPS daemon
 systemctl enable gpsd.service
+systemctl enable dietpi-autostart_custom
+systemctl daemon-reload
 
 # Enable autostart
 dietpi-autostart 17
@@ -35,7 +37,7 @@ tee /var/lib/dietpi/dietpi-autostart/custom.sh > /dev/null << EOF
 /usr/local/share/footrecon/venv/bin/footrecon --headless
 exit 0
 EOF
-chmod u+x /var/lib/dietpi/dietpi-autostart/custom.sh
+chmod a+x /var/lib/dietpi/dietpi-autostart/custom.sh
 
 # Reboot
 echo -e "\n\e[32;1;5mFinished!\e[0m (rebooting)"

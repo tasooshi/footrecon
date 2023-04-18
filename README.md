@@ -19,7 +19,7 @@ What the script does:
 1. Installs the project from source.
 1. Installs Python requirements.
 1. Enables required services.
-1. Installs the custom autostart script (running in background as `root`).
+1. Installs the custom autostart script (running in the foreground as the user specified in `/boot/dietpi.txt`).
 1. Reboots.
 
 The output will be stored in the root of the filesystem in `/footrecon-*` directories.

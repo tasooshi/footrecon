@@ -7,27 +7,34 @@ fi
 
 export DEBIAN_FRONTEND=noninteractive
 
+# Install required packages
 apt-get install -y -o APT::Immediate-Configure=false git build-essential python3-pip python3-dev python3-venv libportaudio2 bluetooth gpsd gpsd-clients libjpeg-dev libffi-dev ffmpeg libatlas3-base python3-pycparser
 
+# Enable wireless devices
 /boot/dietpi/func/dietpi-set_hardware wifimodules onboard_enable
 /boot/dietpi/func/dietpi-set_hardware wifimodules enable
 /boot/dietpi/func/dietpi-set_hardware bluetooth enable
 echo "auto wlan0" >> /etc/network/interfaces
 
-mkdir -p /usr/local/share/footrecon /usr/local/src/footrecon
-chown $SUDO_USER:$SUDO_USER /usr/local/share/footrecon /usr/local/src/footrecon
+# Clone repository and install from source along with Python requirements
+mkdir -p /usr/local/share/footrecon
+git clone https://github.com/tasooshi/footrecon.git /usr/local/src/footrecon
+python3 -m venv --system-site-packages /usr/local/share/footrecon/venv
+source /usr/local/share/footrecon/venv/bin/activate
+pip install --upgrade pip
+pip install -e /usr/local/src/footrecon/
 
-chmod a+s /usr/sbin/iwlist
-chmod a+s /usr/bin/btmgmt
-sudo -u $SUDO_USER -i <<EOF
-    git clone https://github.com/tasooshi/footrecon.git /usr/local/src/footrecon
-    python3 -m venv --system-site-packages /usr/local/share/footrecon/venv
-    source /usr/local/share/footrecon/venv/bin/activate
-    pip install --upgrade pip
-    pip install -e /usr/local/src/footrecon
-EOF
-
-usermod -a -G dialout,audio,video,netdev,bluetooth $SUDO_USER
+# Enable GPS daemon
 systemctl enable gpsd.service
 
-echo -e "\n\e[32;1;5mFinished!\e[0m (reboot is recommended)"
+# Enable autostart
+dietpi-autostart 14
+tee /var/lib/dietpi/dietpi-autostart/custom.sh > /dev/null << EOF
+#!/bin/bash
+/usr/local/share/footrecon/venv/bin/footrecon --headless
+exit 0
+EOF
+
+# Reboot
+echo -e "\n\e[32;1;5mFinished!\e[0m (rebooting)"
+reboot

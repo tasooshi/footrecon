@@ -6,31 +6,46 @@ A mobile all-in-one solution for the initial on-premises information gathering u
 
 ![Footrecon - main view](docs/footrecon-screenshot.png)
 
-## Installation
+## Deployment
 
-As a regular `dietpi` user:
+As a regular `dietpi` user on a fresh DietPi image run the following:
 
     dietpi@DietPi:~$ sudo /bin/bash -c "$(curl https://raw.githubusercontent.com/tasooshi/footrecon/main/install/dietpi.sh)"
 
-### Autoboot
+What the script does:
 
-You may want to start Footrecon automatically on-boot. In this case it is best to use the `dietpi-autostart` utility. Add the following to your (custom, foreground, autologin) script:
+1. Installs required packages.
+1. Enables wireless devices.
+1. Installs the project from source.
+1. Installs Python requirements.
+1. Enables required services.
+1. Installs the custom autostart script (running in background as `root`).
+1. Reboots.
 
-    #!/bin/bash
-    /usr/local/share/footrecon/venv/bin/footrecon
-    exit 0
+The output will be stored in the root of the filesystem in `/footrecon-*` directories.
 
-For a headless mode and auto-start use the `--headless` argument:
+## Modules
 
-    #!/bin/bash
-    /usr/local/share/footrecon/venv/bin/footrecon --headless
-    exit 0
+### Audio
 
-Finally, fix the permissions:
+Records from default audio input device and saves to a WAV file.
 
-    dietpi@DietPi:~: sudo chmod a+x /var/lib/dietpi/dietpi-autostart/custom.sh
+### Bluetooth
 
-### Notes
+Collects Blutooth addresses, device names and RSSI and stores in a CSV file.
 
-* It takes the first available device from every device group.
-* The installation script uses the `sudo` environment variable `$SUDO_USER` as the target user for which the necessary changes should be made. You may want to adjust that to your setup.
+### Camera
+
+Takes picture every 2 seconds and stores as JPEGs.
+
+### Satnav
+
+Stores location data if a gpsd compatible device is available, otherwise the CSV file is empty.
+
+### Wireless
+
+Collects wireless networks details, i.a. SSIDs, encryption, signal strength and MACs in a CSV file.
+
+## Notes
+
+* It takes the first available device from every device group, so e.g. the first available camera if there are two.

@@ -22,7 +22,7 @@ What the script does:
 1. Installs the custom autostart script (running in the foreground as the user specified in `/boot/dietpi.txt`).
 1. Reboots.
 
-The output will be stored in the root of the filesystem in `/footrecon-*` directories.
+The output will be stored in the `root` home directory.
 
 ## Modules
 

@@ -29,11 +29,13 @@ systemctl enable gpsd.service
 
 # Enable autostart
 dietpi-autostart 17
+mkdir /var/lib/dietpi/dietpi-autostart
 tee /var/lib/dietpi/dietpi-autostart/custom.sh > /dev/null << EOF
 #!/bin/bash
 /usr/local/share/footrecon/venv/bin/footrecon --headless
 exit 0
 EOF
+chmod u+x /var/lib/dietpi/dietpi-autostart/custom.sh
 
 # Reboot
 echo -e "\n\e[32;1;5mFinished!\e[0m (rebooting)"

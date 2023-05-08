@@ -2,6 +2,7 @@ import csv
 import os
 import shlex
 import subprocess
+import time
 
 from footrecon.core.logs import logger
 from footrecon.core import modules
@@ -57,3 +58,4 @@ class Bluetooth(modules.Module):
                     logger.debug(f'Saved output to {output_file_name}')
                 fil.flush()
                 os.fsync(fil)
+                time.sleep(self.interval)

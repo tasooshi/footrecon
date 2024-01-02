@@ -27,7 +27,7 @@ class Bluetooth(modules.Module):
             '/usr/bin/btmgmt',
             'find',
         )
-        with open(self.output_file_name, 'w', newline='') as fil:
+        with open(self.output_file_name, 'w', newline='', encoding='utf-8') as fil:
             writer = csv.writer(fil, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             for _ in self.loop:
                 now = self.isodatetime()
@@ -49,7 +49,7 @@ class Bluetooth(modules.Module):
                     output = list(item)
                     output.insert(0, now)
                     writer.writerow(output)
-                    logger.debug(f'Module `{self.name}` saved output to {self.output_file_name}')
+                logger.debug(f'Module `{self.name}` saved output to {self.output_file_name}')
                 fil.flush()
                 os.fsync(fil)
 
@@ -76,12 +76,11 @@ class Wireless(modules.Module):
             self.device,
             'scan',
         )
-        with open(self.output_file_name, 'w', newline='') as fil:
+        with open(self.output_file_name, 'w', newline='', encoding='utf-8') as fil:
             writer = csv.writer(fil, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             for _ in self.loop:
                 proc = subprocess.run(cmd_args, capture_output=True, universal_newlines=True)
-                lines = proc.stdout.split('\n')
-                lines = [line.strip() for line in lines]
+                lines = [line.strip() for line in proc.stdout.split('\n')]
                 indexes = [i for i, s in enumerate(lines) if 'Cell ' in s]
                 if indexes:
                     rows = list()
@@ -91,6 +90,6 @@ class Wireless(modules.Module):
                         data.insert(0, now)
                         rows.append(data)
                     writer.writerows(rows)
-                    logger.debug(f'Module `{self.name}` saved output to {self.output_file_name}')
+                logger.debug(f'Module `{self.name}` saved output to {self.output_file_name}')
                 fil.flush()
                 os.fsync(fil)

@@ -63,7 +63,8 @@ class App:
     def stop(self, final=False):
         self.stop_event.set()
         for module in self.data['modules'].values():
-            module.loop.sleep_event.set()
+            if hasattr(module, 'loop'):
+                module.loop.sleep_event.set()
         for task in self.tasks:
             task.result()
         if final:
@@ -309,7 +310,9 @@ def entry_point():
     if pathlib.Path(parsed_args.config).exists():
         app.load_config(parsed_args.config)
     else:
-        logger.error(f'Configuration file missing ({parsed_args.config})')
+        msg = f'Configuration file missing ({parsed_args.config})'
+        logger.error(msg)
+        print(msg)
         sys.exit(1)
     if parsed_args.headless:
         app.headless = True

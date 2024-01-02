@@ -19,7 +19,7 @@ echo "auto wlan0" >> /etc/network/interfaces
 # Clone repository and install from source along with Python requirements
 mkdir -p /usr/local/share/footrecon
 git clone https://github.com/tasooshi/footrecon.git /usr/local/src/footrecon
-cp /usr/local/src/footrecon/docs/footrecon.ini.example /usr/local/src/footrecon/footrecon.ini
+cp /usr/local/src/footrecon/install/footrecon.ini.example /usr/local/src/footrecon/footrecon.ini
 python3 -m venv --system-site-packages /usr/local/share/footrecon/venv
 source /usr/local/share/footrecon/venv/bin/activate
 pip install --upgrade pip
@@ -27,7 +27,6 @@ pip install -e /usr/local/src/footrecon/
 
 # Enable GPS daemon
 systemctl enable gpsd.service
-systemctl enable dietpi-autostart_custom
 systemctl daemon-reload
 
 # Enable autostart
@@ -35,7 +34,7 @@ dietpi-autostart 17
 mkdir /var/lib/dietpi/dietpi-autostart
 tee /var/lib/dietpi/dietpi-autostart/custom.sh > /dev/null << EOF
 #!/bin/bash
-/usr/local/share/footrecon/venv/bin/footrecon --headless
+/usr/local/share/footrecon/venv/bin/footrecon --headless --config /usr/local/src/footrecon/footrecon.ini
 exit 0
 EOF
 chmod a+x /var/lib/dietpi/dietpi-autostart/custom.sh

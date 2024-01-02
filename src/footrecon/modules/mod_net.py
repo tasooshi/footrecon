@@ -18,6 +18,8 @@ class Ssh(modules.Module):
         self.remote_port = int(remote_port)
         self.username = username
         self.key = key
+        if not all((self.username, self.key)):
+            raise RuntimeError('Both `username` and `key` must be defined for Ssh module')
 
     def task(self):
         for _ in self.loop:
@@ -35,10 +37,12 @@ class Ssh(modules.Module):
                     logger.debug(f'Module `{self.name}` believes connection is established with {self.host}:{self.port}')
             if failed:
                 logger.debug(f'Module `{self.name}` establishing SSH connection to {self.host}:{self.port}')
-                subprocess.run(shlex.split(f'ssh -f -N -R -i {self.key} -o StrictHostKeyChecking=no {self.remote_port}:localhost:{self.port} {self.host}'))
+                subprocess.run(shlex.split(f'ssh -f -N -i {self.key} -o StrictHostKeyChecking=no -R{self.remote_port}:localhost:{self.port} {self.username}@{self.host}'))
 
 
 class Healthcheck(modules.Module):
+
+    timeout = 5
 
     def setup(self, interval=60, endpoint='http://127.0.0.1/?id='):
         self.interval = int(interval)
@@ -47,4 +51,4 @@ class Healthcheck(modules.Module):
     def task(self):
         for counter in self.loop:
             logger.debug(f'Module `{self.name}` sending GET request to {self.endpoint}')
-            requests.get(self.endpoint + str(counter))
+            requests.get(self.endpoint + str(counter), timeout=self.timeout)

@@ -26,7 +26,7 @@ class Satnav(modules.Module):
             '--count',
             '1',
         )
-        with open(self.output_file_name, 'w', newline='') as fil:
+        with open(self.output_file_name, 'w', newline='', encoding='utf-8') as fil:
             writer = csv.writer(fil, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             for _ in self.loop:
                 lines = subprocess.run(cmd_args, capture_output=True, universal_newlines=True).stdout.splitlines()

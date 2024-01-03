@@ -50,5 +50,13 @@ class Healthcheck(modules.Module):
 
     def task(self):
         for counter in self.loop:
-            logger.debug(f'Module `{self.name}` sending GET request to {self.endpoint}')
-            requests.get(self.endpoint + str(counter), timeout=self.timeout)
+            url = self.endpoint + str(counter)
+            logger.debug(f'Module `{self.name}` sending GET request to {url}')
+            try:
+                requests.get(url, timeout=self.timeout)
+            except requests.exceptions.ConnectionError:
+                logger.debug(f'Module `{self.name}` could not connect to {self.endpoint}')
+            except requests.exceptions.Timeout:
+                logger.debug(f'Module `{self.name}` timed out when requesting {url}')
+            else:
+                logger.debug(f'Module `{self.name}` successfully requested {url}')

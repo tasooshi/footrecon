@@ -303,10 +303,17 @@ def entry_point():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     parser.add_argument('-c', '--config', help='Configuration file', default='footrecon.ini')
+    parser.add_argument('--log', help='Log file', default='footrecon.log')
     parser.add_argument('--headless', action='store_true', help='Run in headless mode')
     parser.add_argument('--debug', action='store_const', dest='loglevel', const=logging.DEBUG, default=logging.INFO, help='Enable debugging mode (verbose output)')
     parsed_args = parser.parse_args()
     logger.setLevel(parsed_args.loglevel)
+
+    formatter = logging.Formatter('%(levelname)s [%(asctime)s] %(message)s')
+    file_handler = logging.FileHandler(parsed_args.log)
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+
     if pathlib.Path(parsed_args.config).exists():
         app.load_config(parsed_args.config)
     else:

@@ -11,10 +11,11 @@ class Ssh(modules.Module):
 
     interval = 60
 
-    def setup(self, interval=60, host='127.0.0.1', port=22, remote_port=0, username=None, key=None):
+    def setup(self, interval=60, host='127.0.0.1', local_port=22, remote_port=0, port=22, username=None, key=None):
         self.interval = int(interval)
         self.host = host
         self.port = int(port)
+        self.local_port = int(local_port)
         self.remote_port = int(remote_port)
         self.username = username
         self.key = key
@@ -37,7 +38,7 @@ class Ssh(modules.Module):
                     logger.debug(f'Module `{self.name}` believes connection is established with {self.host}:{self.port}')
             if failed:
                 logger.debug(f'Module `{self.name}` establishing SSH connection to {self.host}:{self.port}')
-                subprocess.run(shlex.split(f'ssh -f -N -i {self.key} -o StrictHostKeyChecking=no -R{self.remote_port}:localhost:{self.port} {self.username}@{self.host}'))
+                subprocess.run(shlex.split(f'ssh -f -N -i {self.key} -o StrictHostKeyChecking=no -R{self.remote_port}:localhost:{self.local_port} {self.username}@{self.host} -p {self.port}'))
 
 
 class Healthcheck(modules.Module):

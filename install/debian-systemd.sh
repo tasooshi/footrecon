@@ -11,11 +11,13 @@ tee /etc/systemd/system/footrecon.service > /dev/null << EOF
 Description=footrecon
 
 [Service]
+Type=simple
+Restart=always
+RestartSec=5
 User=root
 Group=root
-Type=exec
 WorkingDirectory=/root
-ExecStart=/usr/local/share/footrecon/venv/bin/footrecon --headless --config /usr/local/src/footrecon/footrecon.ini
+ExecStart=/usr/local/share/footrecon/venv/bin/footrecon --headless --config /usr/local/src/footrecon/footrecon.ini --log /var/log/footrecon.log
 
 [Install]
 WantedBy=multi-user.target

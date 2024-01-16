@@ -94,6 +94,7 @@ Default values can be overwritten per class-basis:
     interval = 120
     host = 127.0.0.1
     port = 22
+    local_port = 22
     remote_port = 0
     username = hello
     key = /root/.ssh/id_hello
